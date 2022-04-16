@@ -107,33 +107,10 @@ class AdsCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated, AdsPermission]
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class AdsUpdateView(UpdateView):
-    model = Ads
-    fields = ["name", "author_id", "price", "description", "category_id"]
-
-    def patch(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
-
-        ad_data = json.loads(request.body)
-        self.object.name = ad_data["name"]
-        self.object.price = ad_data["price"]
-        self.object.author_id = get_object_or_404(User, pk=ad_data["author_id"])
-        self.object.category_id = get_object_or_404(Categories, pk=ad_data["category_id"])
-        self.object.description = ad_data["description"]
-
-        self.object.save()
-        return JsonResponse({
-            "id": self.object.id,
-            "name": self.object.name,
-            "author_id": self.object.author_id_id,
-            "author": self.object.author_id.first_name,
-            "price": self.object.price,
-            "description": self.object.description,
-            "is_published": self.object.is_published,
-            "category_id": self.object.category_id_id,
-            "image": self.object.image.url,
-        })
+class AdsUpdateView(UpdateAPIView):
+    queryset = Ads.objects.all()
+    serializer_class = AdsSerializer
+    permission_classes = [IsAuthenticated, AdsPermission]
 
 
 @method_decorator(csrf_exempt, name='dispatch')
